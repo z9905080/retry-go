@@ -167,11 +167,14 @@ func Do(retryableFunc RetryableFunc, opts ...Option) error {
 
 func newDefaultRetryConfig() *Config {
 	return &Config{
-		attempts:      uint(10),
-		delay:         100 * time.Millisecond,
-		maxJitter:     100 * time.Millisecond,
-		onRetry:       func(n uint, err error) {},
-		retryIf:       IsRecoverable,
+		attempts:  uint(10),
+		delay:     100 * time.Millisecond,
+		maxJitter: 100 * time.Millisecond,
+		onRetry:   func(n uint, err error) {},
+		retryIf:   IsRecoverable,
+		breakIf: func(err error) bool {
+			return false
+		},
 		delayType:     CombineDelay(BackOffDelay, RandomDelay),
 		lastErrorOnly: false,
 		context:       context.Background(),
