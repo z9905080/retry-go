@@ -10,6 +10,9 @@ import (
 // Function signature of retry if function
 type RetryIfFunc func(error) bool
 
+// BreakIfFunc when signature of break if function error
+type BreakIfFunc func(error) bool
+
 // Function signature of OnRetry function
 // n = count of attempts
 type OnRetryFunc func(n uint, err error)
@@ -29,6 +32,7 @@ type Config struct {
 	maxJitter     time.Duration
 	onRetry       OnRetryFunc
 	retryIf       RetryIfFunc
+	breakIf       BreakIfFunc
 	delayType     DelayTypeFunc
 	lastErrorOnly bool
 	context       context.Context
@@ -191,6 +195,15 @@ func RetryIf(retryIf RetryIfFunc) Option {
 	}
 	return func(c *Config) {
 		c.retryIf = retryIf
+	}
+}
+
+func BreakIf(breakIf BreakIfFunc) Option {
+	if breakIf == nil {
+		return emptyOption
+	}
+	return func(c *Config) {
+		c.breakIf = breakIf
 	}
 }
 

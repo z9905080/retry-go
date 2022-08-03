@@ -99,6 +99,10 @@ func Do(retryableFunc RetryableFunc, opts ...Option) error {
 		for err := retryableFunc(); err != nil; err = retryableFunc() {
 			n++
 
+			if config.breakIf(err) {
+				return err
+			}
+
 			config.onRetry(n, err)
 			select {
 			case <-time.After(delay(config, n, err)):
